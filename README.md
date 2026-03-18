@@ -1,6 +1,6 @@
 # Claude Code Patcher
 
-Automatically patches Claude Code's security restrictions and survives updates.
+Patches Claude Code's security restrictions and re-applies automatically on every invocation.
 
 ## Quick Start
 
@@ -10,7 +10,7 @@ Automatically patches Claude Code's security restrictions and survives updates.
 install.cmd
 ```
 
-This applies the patches immediately, adds the patcher to your PATH, and sets up a scheduled task to re-patch on login.
+Applies the patches immediately and adds the patcher directory to your PATH.
 
 **2. Open a new terminal and run Claude normally:**
 
@@ -18,7 +18,7 @@ This applies the patches immediately, adds the patcher to your PATH, and sets up
 claude
 ```
 
-That's it. The wrapper intercepts the `claude` command, re-patches if needed (e.g. after an update), then launches Claude.
+The wrapper intercepts the `claude` command, re-patches if needed (e.g. after an update), then launches Claude.
 
 ## Manual Commands
 
@@ -52,30 +52,16 @@ node patcher.js --target "C:\path\to\app.exe"
 | `malicious-exe-skip` | Removes the block on running executables flagged as potentially malicious |
 | `file-read-system-reminder` | Replaces the per-file-read malware refusal reminder with a permissive researcher prompt |
 
-## Auto-Patching
-
-Patches survive Claude updates via two mechanisms set up by `install.cmd`:
-
-- **Scheduled task** — runs `patcher.js` on every login
-- **Wrapper** — re-checks and patches on every `claude` invocation
-
-Optional real-time watcher (re-patches the moment Claude updates):
-
-```batch
-powershell -ExecutionPolicy Bypass -File watcher.ps1
-```
-
 ## Files
 
 | File | Purpose |
 |------|---------|
 | `patcher.js` | Core patching logic — text and binary (asar/exe) targets |
-| `claude-wrapper.js` | Patches then spawns the real claude |
+| `claude-wrapper.js` | Patches then spawns the real Claude |
 | `claude.cmd` | Entry point — invoked when you type `claude` |
-| `install.cmd` | One-time setup: PATH, scheduled task, watcher script |
-| `uninstall.cmd` | Removes scheduled task |
+| `install.cmd` | One-time setup: PATH + initial patch |
+| `uninstall.cmd` | Removes patch marker file |
 | `addpath.ps1` | Adds patcher dir to user PATH (called by install.cmd) |
-| `watcher.ps1` | (generated) Real-time file watcher |
 
 ## Adding Custom Patches
 
