@@ -277,6 +277,7 @@ function deployCLAUDEMd() {
     const dest = path.join(process.env.APPDATA, 'Claude', 'CLAUDE.md');
     try {
         fs.mkdirSync(path.dirname(dest), { recursive: true });
+        if (getFileHash(src) === getFileHash(dest)) return;
         fs.copyFileSync(src, dest);
         console.log(`[patcher] CLAUDE.md deployed to ${dest}`);
     } catch (e) {
