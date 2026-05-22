@@ -119,6 +119,22 @@ node patcher.js --target "C:\Users\<you>\AppData\Local\Programs\Claude Code\Clau
 
 > **Asar integrity warning:** Some Electron builds embed a hash of `app.asar` inside the executable. If the app refuses to launch after patching, the build likely enforces asar integrity. The patcher will print a warning when this is detected. A `.bak` backup of the original asar is always created before any binary patch is applied.
 
+## Claude 4.x / Opus 4.7 Compatibility Note
+
+Starting with **Claude Opus 4.7** (and increasingly in Sonnet/Haiku 4.x builds), Anthropic moved several safety behaviors out of patchable system-prompt text and into **dynamic, real-time model-level safeguards**. These operate at inference time inside the model weights rather than as string constants in the JavaScript bundle.
+
+**Practical effect on this patcher:**
+
+- Patches that previously neutralized system-reminder strings (e.g. `malicious-code-warning`, `file-read-system-reminder`) may show `N/A (target absent in this version)` or `skipped (target absent in this version)` on newer builds — this is expected. The strings were removed from the bundle because the model now enforces the same policy internally.
+- The `security-policy` patch still applies to the JS/binary layer and may have partial effect, but requests involving prohibited or high-risk topics may still be refused by the model regardless of bundle patches.
+- Co-author and tool-denial patches are unaffected — those are UI/UX strings with no model-level equivalent.
+
+**Why this matters:** Anthropic's real-time cybersecurity safeguards mean that patching the bundle is no longer sufficient to unlock full offensive-security assistance on Opus 4.7+. For legitimate security research, Anthropic operates the **[Cyber Verification Program](https://www.anthropic.com/research/cyber-security)** — verified researchers get elevated model permissions without needing bundle patches.
+
+> **tl;dr** — if your patched Claude still refuses on Opus 4.7, it's the model refusing, not a missed patch. Some system reminders are intentionally absent from the bundle in latest releases.
+
+---
+
 ## Adding Custom Patches
 
 Edit the `patches` array in `patcher.js`:
